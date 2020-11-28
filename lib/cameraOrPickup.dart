@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:flutter/material.dart';
+import 'pickupvideo.dart';
 
 class Pickup extends StatefulWidget {
   @override
@@ -10,16 +11,32 @@ class Pickup extends StatefulWidget {
 
 class _PickupState extends State<Pickup> {
   List<Asset> images = List<Asset>();
-
   String error = '';
 
   Widget buildGridView() {
-    print('gwa elgrod ${images.length}');
     return GridView.count(
-      crossAxisCount: 5,
+      crossAxisCount: 4,
       children: List.generate(images.length, (index) {
         Asset asset = images[index];
-        return AssetThumb(asset: asset, width: 300, height: 300);
+        return Stack(
+          children: [
+            AssetThumb(asset: asset, width: 300, height: 300),
+            Positioned(
+                top: 0,
+                right: 0,
+                bottom: 60,
+                child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        images.removeAt(index);
+                      });
+                    },
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.grey,
+                    )))
+          ],
+        );
       }),
     );
   }
@@ -30,10 +47,10 @@ class _PickupState extends State<Pickup> {
     return Scaffold(
       body:
           Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Padding(
-          padding: const EdgeInsets.only(right: 50, left: 50, top: 60),
-          child: images.length == 0
-              ? Container(
+        images.length == 0
+            ? Padding(
+                padding: const EdgeInsets.only(right: 50, left: 50, top: 60),
+                child: Container(
                   height: 300,
                   decoration: BoxDecoration(
                     image: DecorationImage(
@@ -41,9 +58,9 @@ class _PickupState extends State<Pickup> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                )
-              : Container(height: 400, width: 400, child: buildGridView()),
-        ),
+                ),
+              )
+            : Container(height: 400, width: 600, child: buildGridView()),
         GestureDetector(
           onTap: getImage,
           child: Container(
@@ -80,20 +97,23 @@ class _PickupState extends State<Pickup> {
               )),
         ),
         Container(
-          color: Colors.blueAccent,
+          // color: Colors.blueAccent,
           width: double.infinity,
+          color: Colors.blue,
           // color: Colors.blue[300],
           child: Column(
             children: [
               FlatButton(
-                  color: Colors.blue,
-                  //  color: Colors.blue[300],
-                  onPressed: () {},
-                  child: Text('Upload')),
-              FlatButton(
-                  color: Colors.blue[300],
-                  onPressed: null,
-                  child: Text('Next')),
+                  color: Colors.blue, onPressed: () {}, child: Text('Upload')),
+              Container(
+                child: FlatButton(
+                    color: Colors.blue,
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (ctx) => VideoPicker()));
+                    },
+                    child: Text('Next')),
+              ),
             ],
           ),
         )
@@ -137,14 +157,3 @@ class _PickupState extends State<Pickup> {
     });
   }
 }
-
-// class Gridvieww extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return GridView.builder(
-//       itemCount: images.,
-//         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-
-//             childAspectRatio: 3 / 2, crossAxisCount: 5),
-//         itemBuilder: (ctx, i) => Image(image: image[i]));
-//   }
